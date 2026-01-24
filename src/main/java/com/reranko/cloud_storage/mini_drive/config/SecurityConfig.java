@@ -1,9 +1,14 @@
 package com.reranko.cloud_storage.mini_drive.config;
 
+import com.reranko.cloud_storage.mini_drive.auth.jwt.JwtAuthenticationFilter;
+import com.reranko.cloud_storage.mini_drive.auth.jwt.JwtService;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 
 @Configuration // Indicates that this class contains configuration settings for the application.
 public class SecurityConfig{
@@ -12,7 +17,7 @@ public class SecurityConfig{
     /* Bean is something you create once and give to Spring, and Spring remembers it and uses it for you automatically whenever it's needed.
      * In this case, we create a SecurityFilterChain bean that configures the security settings for our application.
      */
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtService jwtService) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             /* csrf => Cross-Site Request Forgery
@@ -20,12 +25,16 @@ public class SecurityConfig{
              * In this case, we disable it to allow all requests without CSRF protection.
              * Disabling because we are will use REST API and JWT for authentication in the future.
              */
-            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-            .formLogin(form -> form.disable())
-            .httpBasic(basic -> basic.disable());
-            /* httpBasic is and authentication mechnanism that sends username and password with every request using HTTP headers.
-             * In this case, we disable it to allow all requests without authentication.
-             */
+            .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/auth/**").permitAll() // Here it means only auth does not require token everything else does
+                    .anyRequest().authenticated()
+            )
+            .addFilterBefore(
+                    new JwtAuthenticationFilter(jwtService),
+                    UsernamePasswordAuthenticationFilter.class
+            );
+        
+
         return http.build();
         /* build() method is called to create the SecurityFilterChain object with the configured settings.
          */

@@ -1,6 +1,9 @@
-package com.reranko.cloud_storage.mini_drive.config;
+package com.reranko.cloud_storage.mini_drive.auth.controller;
 
-import org.reranko.cloud_storage.mini_drive.auth.dto.RegisterRequest;
+import com.reranko.cloud_storage.mini_drive.auth.dto.RegisterRequest;
+import com.reranko.cloud_storage.mini_drive.auth.dto.LoginRequest;
+import com.reranko.cloud_storage.mini_drive.auth.service.AuthService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +15,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth") // All URLs in this controller will start with /auth
 public class AuthController {
 
+    private final AuthService authService; // Service that contains the business logic for authentication
+
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
+
     @PostMapping("/register") // When someone sends a POST request to /auth/register, this method is called
     public ResponseEntity<String> register(@RequestBody RegisterRequest request) { // Take the JSON sent by the user and put it into a Java object
         return ResponseEntity.ok("Registration request received"); // Send back a simple response saying we got the request
@@ -19,8 +28,8 @@ public class AuthController {
 
     @PostMapping("/login") // When someone sends a POST request to /auth/login, this method is called
     public ResponseEntity<String> login(@RequestBody LoginRequest request) { // Take the JSON sent by the user and put it into a Java object    
-        authService.login(request); // Call the AuthService to handle the login logic
-        return ResponseEntity.ok("Login successful"); // Send back a simple response saying login was successful
+        String token = authService.login(request); // Call the AuthService to handle the login logic
+        return ResponseEntity.ok(token); // Send back the generated JWT token as the response
 
     }
 }
