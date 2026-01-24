@@ -16,4 +16,11 @@ public class AuthController {
     public ResponseEntity<String> register(@RequestBody RegisterRequest request) { // Take the JSON sent by the user and put it into a Java object
         return ResponseEntity.ok("Registration request received"); // Send back a simple response saying we got the request
     }
+
+    @PostMapping("/login") // When someone sends a POST request to /auth/login, this method is called
+    public ResponseEntity<String> login(@RequestBody LoginRequest request) { // Take the JSON sent by the user and put it into a Java object    
+        authService.login(request); // Call the AuthService to handle the login logic
+        return ResponseEntity.ok("Login successful"); // Send back a simple response saying login was successful
+
+    }
 }

@@ -1,4 +1,4 @@
-package com.reranko.cloud_storage.mini_drive.config;
+package com.reranko.cloud_storage.mini_drive.auth.dto;
 
 public class RegisterRequest {
 
