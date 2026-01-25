@@ -26,8 +26,6 @@ The platform supports multiple users with strict data isolation and secure file 
 - Database (User + File Metadata)
 - AWS S3 (File Storage)
 
-> _A simple architecture diagram will be added later_
-
 ---
 
 ## Authentication & Security
@@ -56,9 +54,7 @@ A user sends an HTTP request to register with an email and password.
   - A unique `userId` is generated as the primary key  
   - Email is stored with a unique constraint  
   - Password is stored in the format:  
-    ```
-    $bcryptVersion$costFactor$salt$hash(password + salt)
-    ```
+    `$bcryptVersion$costFactor$salt$hash(password + salt)`
 
 ---
 
@@ -91,9 +87,7 @@ A JWT consists of three parts:
 - **Signature:**  
   Ensures the token has not been tampered with,
   The secret key is never sent to the client. If any part of the token is modified, signature verification fails.
-  ``` 
-  HMAC-SHA256(SECRET + HEADER + PAYLOAD) = JWT SIGNATURE
-  ```
+  `HMAC-SHA256(SECRET + HEADER + PAYLOAD) = JWT SIGNATURE`
 
 ---
 
@@ -134,8 +128,6 @@ If a request is rejected here:
 | Method | Endpoint | Description |
 |------|---------|-------------|
 | GET | `/me` | Get authenticated user ID |
-
-> _File APIs will be added later_
 
 ---
 
