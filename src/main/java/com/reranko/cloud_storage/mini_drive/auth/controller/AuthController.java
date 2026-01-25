@@ -23,6 +23,7 @@ public class AuthController {
 
     @PostMapping("/register") // When someone sends a POST request to /auth/register, this method is called
     public ResponseEntity<String> register(@RequestBody RegisterRequest request) { // Take the JSON sent by the user and put it into a Java object
+        authService.register(request); // Call the AuthService to handle the registration logic
         return ResponseEntity.ok("Registration request received"); // Send back a simple response saying we got the request
     }
 
