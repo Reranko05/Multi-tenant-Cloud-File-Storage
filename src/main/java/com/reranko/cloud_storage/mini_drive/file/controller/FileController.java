@@ -12,6 +12,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/*
+ * REST controller for managing file upload intents.
+ * Provides an endpoint to create a new file upload intent,
+ * generating metadata and returning the file ID.
+ */
+
 @RestController
 @RequestMapping("/files")
 public class FileController {
@@ -22,7 +28,7 @@ public class FileController {
         this.fileRepository = fileRepository;
     }
 
-    @PostMapping
+    @PostMapping("/upload-intent")
     public ResponseEntity<Long> createUploadIntent(
         @RequestBody CreateFileRequest request
     ) {
