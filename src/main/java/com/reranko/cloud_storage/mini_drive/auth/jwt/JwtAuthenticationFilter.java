@@ -6,8 +6,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 
 import java.util.Collections;
+import java.util.List;
 
 /* 
  * JwtAuthenticationFilter is a filter that intercepts incoming HTTP requests to check for a valid JWT token in the Authorization header.
@@ -62,13 +65,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             String token = header.substring(7);
+            System.out.println("JWT FILTER HIT: " + request.getRequestURI());
 
             if(jwtService.isTokenValid(token)) {
                 Long userId = jwtService.extractUserId(token);
 
+                System.out.println("JWT VALID, setting authentication for userId=" + userId);
+
+
                 UsernamePasswordAuthenticationToken auth = 
                     new UsernamePasswordAuthenticationToken(
-                        userId, null, Collections.emptyList()
+                        userId, null, List.of(new SimpleGrantedAuthority("ROLE_USER"))
                     );
                 
                 SecurityContextHolder.getContext().setAuthentication(auth);
