@@ -27,11 +27,12 @@ public class SecurityConfig{
              * In this case, we disable it to allow all requests without CSRF protection.
              * Disabling because we are will use REST API and JWT for authentication in the future.
              */
+            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                    HttpMethod.POST,
                     "/auth/register",
-                    "/auth/login"
+                    "/auth/login",
+                    "/h2-console/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             )

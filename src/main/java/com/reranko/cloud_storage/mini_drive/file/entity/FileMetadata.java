@@ -1,4 +1,4 @@
-package com.reranko.cloud_strorage.mini_drive.file.entity;
+package com.reranko.cloud_storage.mini_drive.file.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -27,7 +27,7 @@ public class FileMetadata {
 
     // Owner of the file (from JWT)
     @Column(nullable = false)
-    private String ownerUserId;
+    private Long ownerUserId;
 
     // File size in bytes
     @Column(nullable = false)
@@ -63,11 +63,11 @@ public class FileMetadata {
         this.s3ObjectKey = s3ObjectKey;
     }
 
-    public String getOwnerUserId() {
+    public Long getOwnerUserId() {
         return ownerUserId;
     }
 
-    public void setOwnerUserId(String ownerUserId) {
+    public void setOwnerUserId(Long ownerUserId) {
         this.ownerUserId = ownerUserId;
     }
 
