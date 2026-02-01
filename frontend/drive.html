@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mini Drive</title>
+  <link rel="stylesheet" href="drive.css">
+</head>
+<body>
+
+<header>
+  <h1>Mini Drive</h1>
+  <button onclick="logout()">Logout</button>
+</header>
+
+<main>
+  <section class="upload">
+    <input type="file" id="fileInput">
+    <button onclick="uploadFile()">Upload</button>
+  </section>
+
+  <section class="files">
+    <h2>Your Files</h2>
+    <button onclick="loadFiles()">Refresh</button>
+    <ul id="fileList"></ul>
+  </section>
+</main>
+
+<script src="./app.js"></script>
+<script>
+  loadFiles();
+</script>
+</body>
+</html>

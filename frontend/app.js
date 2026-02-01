@@ -1,20 +1,31 @@
 const API_BASE = "http://localhost:8080";
 console.log("JS loaded");
 
-console.log("JS loaded");
-
+/* =======================
+   DOM elements
+   (exist depending on page)
+======================= */
 const regEmail = document.getElementById("regEmail");
 const regPassword = document.getElementById("regPassword");
+
 const loginEmail = document.getElementById("loginEmail");
 const loginPassword = document.getElementById("loginPassword");
-const fileInput = document.getElementById("fileInput");
 
-// expose functions for inline onclick
+const fileInput = document.getElementById("fileInput");
+const fileList = document.getElementById("fileList");
+
+/* =======================
+   Expose functions
+======================= */
 window.register = register;
 window.login = login;
 window.uploadFile = uploadFile;
 window.loadFiles = loadFiles;
+window.logout = logout;
 
+/* =======================
+   Auth helpers
+======================= */
 
 function saveToken(token) {
   localStorage.setItem("jwt", token);
@@ -24,38 +35,75 @@ function getToken() {
   return localStorage.getItem("jwt");
 }
 
-async function register() {
-  console.log("Registering...");
-  const email = regEmail.value;
-  const password = regPassword.value;
+function logout() {
+  localStorage.removeItem("jwt");
+  window.location.href = "./login.html";
+}
 
-  await fetch(`${API_BASE}/auth/register`, {
+function requireAuth() {
+  if (!getToken()) {
+    window.location.href = "./login.html";
+  }
+}
+
+/* =======================
+   Auth actions
+======================= */
+
+async function register() {
+  if (!regEmail || !regPassword) return;
+
+  const res = await fetch(`${API_BASE}/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({
+      email: regEmail.value,
+      password: regPassword.value
+    })
   });
 
-  alert("Registered");
+  if (!res.ok) {
+    alert("Registration failed");
+    return;
+  }
+
+  alert("Registered successfully. Please login.");
 }
 
 async function login() {
-  const email = loginEmail.value;
-  const password = loginPassword.value;
+  if (!loginEmail || !loginPassword) return;
 
   const res = await fetch(`${API_BASE}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({
+      email: loginEmail.value,
+      password: loginPassword.value
+    })
   });
+
+  if (!res.ok) {
+    alert("Invalid credentials");
+    return;
+  }
 
   const token = await res.text();
   saveToken(token);
-  alert("Logged in");
+  window.location.href = "./drive.html";
 }
 
+/* =======================
+   File actions
+======================= */
+
 async function uploadFile() {
+  if (!fileInput) return;
+
   const file = fileInput.files[0];
-  if (!file) return alert("Select a file");
+  if (!file) {
+    alert("Please select a file");
+    return;
+  }
 
   // 1️⃣ Create upload intent
   const intentRes = await fetch(`${API_BASE}/files/upload-intent`, {
@@ -70,6 +118,11 @@ async function uploadFile() {
       contentType: file.type
     })
   });
+
+  if (!intentRes.ok) {
+    alert("Failed to create upload intent");
+    return;
+  }
 
   const { fileId, uploadUrl } = await intentRes.json();
 
@@ -93,19 +146,32 @@ async function uploadFile() {
 }
 
 async function loadFiles() {
+  if (!fileList) return;
+
   const res = await fetch(`${API_BASE}/files`, {
     headers: {
       "Authorization": `Bearer ${getToken()}`
     }
   });
 
+  if (!res.ok) {
+    alert("Failed to load files");
+    return;
+  }
+
   const files = await res.json();
-  const list = document.getElementById("fileList");
-  list.innerHTML = "";
+  fileList.innerHTML = "";
 
   files.forEach(f => {
     const li = document.createElement("li");
     li.textContent = `${f.fileName} (${f.status})`;
-    list.appendChild(li);
+    fileList.appendChild(li);
   });
+}
+
+/* =======================
+   Auto-protect drive page
+======================= */
+if (fileInput || fileList) {
+  requireAuth();
 }
