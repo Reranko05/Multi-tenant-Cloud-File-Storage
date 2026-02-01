@@ -1,7 +1,15 @@
 package com.reranko.cloud_storage.mini_drive.file.entity;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 /**
  * Entity representing metadata for a file stored in the cloud storage system.
@@ -40,6 +48,11 @@ public class FileMetadata {
     // Timestamp of when the file was uploaded
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    // Status of the file upload
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private FileStatus status;
 
     // Getter only for id
     public Long getId() {
@@ -94,4 +107,12 @@ public class FileMetadata {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    public FileStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(FileStatus status) {
+        this.status = status;
+    } 
 }

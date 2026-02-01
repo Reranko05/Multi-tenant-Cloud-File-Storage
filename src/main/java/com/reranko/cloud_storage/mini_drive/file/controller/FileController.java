@@ -1,17 +1,22 @@
 package com.reranko.cloud_storage.mini_drive.file.controller;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.reranko.cloud_storage.mini_drive.file.dto.CreateFileRequest;
 import com.reranko.cloud_storage.mini_drive.file.dto.CreateFileResponse;
 import com.reranko.cloud_storage.mini_drive.file.entity.FileMetadata;
+import com.reranko.cloud_storage.mini_drive.file.entity.FileStatus;
 import com.reranko.cloud_storage.mini_drive.file.repository.FileMetadataRepository;
 import com.reranko.cloud_storage.mini_drive.file.service.S3UploadService;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.security.core.context.SecurityContextHolder;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/files")
@@ -41,6 +46,7 @@ public class FileController {
         file.setContentType(request.getContentType());
         file.setOwnerUserId(userId);
         file.setCreatedAt(LocalDateTime.now());
+        file.setStatus(FileStatus.PENDING);
 
         file.setS3ObjectKey(
             "user-" + userId + "/" + UUID.randomUUID() // UUID => Universally Unique Identifier 
@@ -59,5 +65,30 @@ public class FileController {
                 uploadUrl
             )
         );
+    }
+
+    @PostMapping("/{fileId}/complete")
+    public ResponseEntity<Void> completeUpload(
+        @PathVariable Long fileId
+    ) {
+
+        Long userId = (Long) SecurityContextHolder
+            .getContext()
+            .getAuthentication()
+            .getPrincipal();
+        
+        FileMetadata file = fileRepository
+            .findByIdAndOwnerUserId(fileId, userId)
+            .orElseThrow(() -> new RuntimeException("File not found"));
+        
+        // Prevent double completion
+        if (file.getStatus() != FileStatus.PENDING) {
+            throw new RuntimeException("File already completed");
+        }
+
+        file.setStatus(FileStatus.UPLOADED);
+        fileRepository.save(file);
+
+        return ResponseEntity.ok().build();
     }
 }
