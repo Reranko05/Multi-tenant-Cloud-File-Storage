@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mini Drive</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<h1>Mini Drive</h1>
+
+<section>
+  <h2>Register</h2>
+  <input id="regEmail" placeholder="Email" />
+  <input id="regPassword" type="password" placeholder="Password" />
+  <button type="button" onclick="register()">Register</button>
+</section>
+
+<section>
+  <h2>Login</h2>
+  <input id="loginEmail" placeholder="Email" />
+  <input id="loginPassword" type="password" placeholder="Password" />
+  <button type="button" onclick="login()">Login</button>
+</section>
+
+<section>
+  <h2>Upload File</h2>
+  <input type="file" id="fileInput" />
+  <button type="button" onclick="uploadFile()">Upload</button>
+</section>
+
+<section>
+  <h2>Your Files</h2>
+  <button type="button" onclick="loadFiles()">Refresh List</button>
+  <ul id="fileList"></ul>
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>

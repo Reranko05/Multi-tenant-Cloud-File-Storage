@@ -1,0 +1,19 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+section {
+  margin-bottom: 25px;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+input {
+  margin: 5px 0;
+  display: block;
+}
+
+button {
+  margin-top: 5px;
+}
