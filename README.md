@@ -28,8 +28,8 @@ The platform supports multiple users with strict data isolation and secure file 
 └────────────────────────┬────────────────────────────────┘
                          │
                          ↓
-┌──────────────────────────────────────────────────────────┐
-│        Spring Boot REST API (Java 17)                    │
+┌─────────────────────────────────────────────────────────┐
+│        Spring Boot REST API (Java 17)                   │
 │    ├─ JWT Authentication Filter                         │
 │    ├─ Auth Controller (Register/Login)                  │
 │    ├─ User Controller (Profile)                         │
