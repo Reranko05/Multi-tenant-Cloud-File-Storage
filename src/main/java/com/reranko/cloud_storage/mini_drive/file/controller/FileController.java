@@ -1,10 +1,12 @@
 package com.reranko.cloud_storage.mini_drive.file.controller;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.reranko.cloud_storage.mini_drive.file.dto.CreateFileRequest;
 import com.reranko.cloud_storage.mini_drive.file.dto.CreateFileResponse;
+import com.reranko.cloud_storage.mini_drive.file.dto.FileListItem;
 import com.reranko.cloud_storage.mini_drive.file.entity.FileMetadata;
 import com.reranko.cloud_storage.mini_drive.file.entity.FileStatus;
 import com.reranko.cloud_storage.mini_drive.file.repository.FileMetadataRepository;
@@ -67,7 +70,7 @@ public class FileController {
         );
     }
 
-    @PostMapping("/{fileId}/complete")
+    @PostMapping("/{fileId}/complete") // Endpoint to mark upload as complete
     public ResponseEntity<Void> completeUpload(
         @PathVariable Long fileId
     ) {
@@ -86,9 +89,37 @@ public class FileController {
             throw new RuntimeException("File already completed");
         }
 
+        if (!s3UploadService.objectExists(file.getS3ObjectKey())) {
+            throw new RuntimeException("File not found in S3");
+        }
+
         file.setStatus(FileStatus.UPLOADED);
         fileRepository.save(file);
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<FileListItem>> listFiles() {
+
+        Long userId = (Long) SecurityContextHolder
+            .getContext()
+            .getAuthentication()
+            .getPrincipal();
+
+        List<FileListItem> files = 
+            fileRepository.findAllByOwnerUserId(userId)
+                .stream()
+                .map(file -> new FileListItem(
+                    file.getId(),
+                    file.getOriginalFileName(),
+                    file.getFileSize(),
+                    file.getContentType(),
+                    file.getStatus(),
+                    file.getCreatedAt()
+                ))
+                .toList();
+        
+        return ResponseEntity.ok(files);
     }
 }
