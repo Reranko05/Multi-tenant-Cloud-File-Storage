@@ -122,4 +122,30 @@ public class FileController {
         
         return ResponseEntity.ok(files);
     }
+
+    @GetMapping("/{fileId}/view")
+    public ResponseEntity<String> viewFile(
+            @PathVariable Long fileId
+    ) {
+        Long userId = (Long) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        FileMetadata file = fileRepository
+                .findByIdAndOwnerUserId(fileId, userId)
+                .orElseThrow(() -> new RuntimeException("File not found"));
+
+        // Optional safety check
+        if (file.getStatus() != FileStatus.UPLOADED) {
+            throw new RuntimeException("File not available for viewing");
+        }
+
+        String viewUrl = s3UploadService
+                .generateViewUrl(file.getS3ObjectKey())
+                .toString();
+
+        return ResponseEntity.ok(viewUrl);
+    }
+
 }

@@ -22,6 +22,8 @@ window.login = login;
 window.uploadFile = uploadFile;
 window.loadFiles = loadFiles;
 window.logout = logout;
+window.viewFile = viewFile;
+
 
 /* =======================
    Auth helpers
@@ -154,20 +156,43 @@ async function loadFiles() {
     }
   });
 
-  if (!res.ok) {
-    alert("Failed to load files");
-    return;
-  }
-
   const files = await res.json();
   fileList.innerHTML = "";
 
   files.forEach(f => {
     const li = document.createElement("li");
-    li.textContent = `${f.fileName} (${f.status})`;
+
+    const nameSpan = document.createElement("span");
+    nameSpan.textContent = `${f.fileName} (${f.status}) `;
+
+    const viewBtn = document.createElement("button");
+    viewBtn.textContent = "View";
+    viewBtn.onclick = () => viewFile(f.fileId);
+
+    li.appendChild(nameSpan);
+    li.appendChild(viewBtn);
     fileList.appendChild(li);
   });
 }
+
+async function viewFile(fileId) {
+  const res = await fetch(`${API_BASE}/files/${fileId}/view`, {
+    headers: {
+      "Authorization": `Bearer ${getToken()}`
+    }
+  });
+
+  if (!res.ok) {
+    alert("Unable to view file");
+    return;
+  }
+
+  const viewUrl = await res.text();
+
+  // Open in new tab (Google Drive style)
+  window.open(viewUrl, "_blank");
+}
+
 
 /* =======================
    Auto-protect drive page
